@@ -1,0 +1,12 @@
+const STEPS = {
+  UNSTARTED: 0,
+  ATTACK_STARTED: 1,
+  ATTACK: 2,
+  SUSTAIN_STARTED: 3,
+  SUSTAIN: 4,
+  RELEASE_STARTED: 5,
+  RELEASE: 6,
+  ENDED: 7
+}
+
+export default STEPS

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="{{compiler.publicPath}}">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}" />
+  {{#if compiler.isProduction}}
+  <link rel="stylesheet" href="{{compiler.hash}}.css">
+  {{/if}}
+</head>
+<body>
+  <canvas id="app"></canvas>
+  <script src="{{compiler.hash}}.js"></script>
+</body>
+</html>
