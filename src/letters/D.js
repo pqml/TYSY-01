@@ -1,10 +1,10 @@
 import Letter from 'components/Letter'
-import drawing from './A.drawing.js'
+import drawing from './D.drawing.js'
 
-export default class A extends Letter {
+export default class D extends Letter {
   constructor () {
     super({
-      frequency: 'C4',
+      frequency: 'F4',
       drawing: drawing
     })
   }

@@ -4,17 +4,21 @@ import Store from 'core/Store'
 
 import * as Letters from 'components/Letters'
 import Grid from 'components/Grid'
+import slider from 'components/slider'
 
-const defaultOpts = {
-  maxAttack: 2,
-  maxRelease: 2,
-  maxDecay: 1
-}
+import ms2px from 'utils/ms2px'
+import map from 'utils/map'
+import bounds from 'config/bounds'
+
+const defaultOpts = {}
 
 function jupik (opts) {
   opts = Object.assign({}, defaultOpts, opts)
 
   const stage = new PIXI.Container()
+
+  // Start from the middle of the screen
+  stage.x = window.innerWidth / 2
 
   const renderer = PIXI.autoDetectRenderer(
     window.innerWidth,
@@ -23,29 +27,85 @@ function jupik (opts) {
       view: opts.canvas,
       resolution: window.devicePixelRatio,
       backgroundColor: 0xffffff,
-      antialias: true
+      antialias: false
     }
   )
 
-  renderer.view.style['width'] = window.innerWidth + 'px'
-  renderer.view.style['height'] = window.innerHeight + 'px'
+  // renderer.view.style['width'] = window.innerWidth + 'px'
+  // renderer.view.style['height'] = window.innerHeight + 'px'
 
   let letters = {}
 
   Events.on('keyboard.on', letterOn)
   Events.on('keyboard.off', letterOff)
+
   Events.on('controller.attack', attackChange)
   Events.on('controller.decay', decayChange)
   Events.on('controller.release', releaseChange)
+  Events.on('controller.sustain', sustainChange)
+  Events.on('controller.lfoFreq', lfoFreqChange)
+  Events.on('controller.lfoAmp', lfoAmpChange)
+
+  const controller = opts.controller
+  controller.appendChild(slider({
+    name: 'attack',
+    syncWith: 'controller.attack',
+    onInput: attackChange,
+    transform (v) { return map(v, 0, 127, bounds.minAttack, bounds.maxAttack).toFixed(2) }
+  }))
+
+  controller.appendChild(slider({
+    name: 'decay',
+    syncWith: 'controller.decay',
+    onInput: decayChange,
+    transform (v) { return map(v, 0, 127, bounds.minDecay, bounds.maxDecay).toFixed(2) }
+  }))
+
+  controller.appendChild(slider({
+    name: 'sustain',
+    syncWith: 'controller.sustain',
+    onInput: sustainChange,
+    default: 70,
+    units: '%',
+    transform (v) { return map(v, 0, 127, 0, 100).toFixed(2) }
+  }))
+
+  controller.appendChild(slider({
+    name: 'release',
+    syncWith: 'controller.release',
+    onInput: releaseChange,
+    transform (v) { return map(v, 0, 127, bounds.minRelease, bounds.maxRelease).toFixed(2) }
+  }))
+
+  controller.appendChild(slider({
+    name: 'lfo freq',
+    syncWith: 'controller.lfoFreq',
+    onInput: lfoFreqChange,
+    default: 0.01,
+    units: '',
+    transform (v) { return map(v, 0, 127, bounds.minLfoFreq, bounds.maxLfoFreq).toFixed(2) }
+  }))
+
+  controller.appendChild(slider({
+    name: 'lfo amp',
+    syncWith: 'controller.lfoAmp',
+    onInput: lfoAmpChange,
+    default: 0,
+    units: '',
+    transform (v) { return map(v, 0, 127, bounds.minLfoAmp, bounds.maxLfoAmp).toFixed(2) }
+  }))
+
 
   Store.set('renderer', renderer)
   Store.set('zoom', 1)
   Store.set('size', { w: window.innerWidth, h: window.innerHeight })
   Store.set('time', 0)
-  Store.set('fx.attack', 0)
-  Store.set('fx.decay', 0)
-  Store.set('fx.sustain', 0)
-  Store.set('fx.release', 0)
+  Store.set('fx.attack', bounds.minAttack / 1000)
+  Store.set('fx.decay', bounds.minDecay / 1000)
+  Store.set('fx.release', bounds.minRelease / 1000)
+  sustainChange(70)
+  lfoFreqChange(0.01)
+  lfoAmpChange(0)
 
   const grid = new Grid()
   stage.addChild(grid.container)
@@ -56,18 +116,33 @@ function jupik (opts) {
   }
 
   function attackChange (attack) {
-    const value = attack / 127 * opts.maxAttack
+    const value = map(attack, 0, 127, bounds.minAttack, bounds.maxAttack) / 1000
     Store.set('fx.attack', value)
   }
 
   function decayChange (decay) {
-    const value = decay / 127 * opts.maxDecay
+    const value = map(decay, 0, 127, bounds.minDecay, bounds.maxDecay) / 1000
     Store.set('fx.decay', value)
   }
 
   function releaseChange (release) {
-    const value = release / 127 * opts.maxRelease
+    const value = map(release, 0, 127, bounds.minRelease, bounds.maxRelease) / 1000
     Store.set('fx.release', value)
+  }
+
+  function sustainChange (sustain) {
+    const value = map(sustain, 0, 127, 0, 100) / 100
+    Store.set('fx.sustain', value)
+  }
+
+  function lfoFreqChange (val) {
+    val = map(val, 0, 127, bounds.minLfoFreq, bounds.maxLfoFreq)
+    Store.set('fx.lfoFreq', val)
+  }
+
+  function lfoAmpChange (val) {
+    val = map(val, 0, 127, bounds.minLfoAmp, bounds.maxLfoAmp)
+    Store.set('fx.lfoAmp', val)
   }
 
   function letterOn (letter) {
@@ -77,7 +152,6 @@ function jupik (opts) {
     letters[letter].push(newLetter)
     newLetter.start()
     stage.addChild(newLetter.container)
-    console.log(newLetter.container)
   }
 
   function letterOff (letter) {
@@ -93,7 +167,9 @@ function jupik (opts) {
 
   function tick (dt) {
     // update global time
-    Store.set('time', dt)
+    const ntime = Store.get('time') + dt
+    Store.set('time', ntime)
+    Store.set('distance', ms2px(ntime))
 
     // update grid position
     grid.tick(dt)
@@ -102,6 +178,7 @@ function jupik (opts) {
     for (let k in letters) letters[k].forEach(letter => letter.tick(dt))
 
     // render the scene
+    stage.x -= ms2px(dt)
     renderer.render(stage)
   }
 }
