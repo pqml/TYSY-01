@@ -1,6 +1,26 @@
-import A from 'letters/A'
-import B from 'letters/B'
-import C from 'letters/C'
-import D from 'letters/D'
+import letterClass from 'utils/createLetterClass'
 
-export { A, B, C, D }
+export let A = letterClass({ name: 'A', freq: 'C3', drawing: require('drawings/A') })
+export let B = letterClass({ name: 'B', freq: 'D3', drawing: require('drawings/B') })
+export let C = letterClass({ name: 'C', freq: 'E3', drawing: require('drawings/C') })
+export let D = letterClass({ name: 'D', freq: 'F3', drawing: require('drawings/D') })
+export let E = letterClass({ name: 'E', freq: 'G3', drawing: require('drawings/E') })
+export let F = letterClass({ name: 'F', freq: 'A3', drawing: require('drawings/F') })
+// export let G = letterClass({ name: 'G', freq: 'C4', drawing: require('drawings/G') })
+export let H = letterClass({ name: 'H', freq: 'C4', drawing: require('drawings/H') })
+export let I = letterClass({ name: 'I', freq: 'D4', drawing: require('drawings/I') })
+export let J = letterClass({ name: 'J', freq: 'E4', drawing: require('drawings/J') })
+// export let K = letterClass({ name: 'K', freq: 'F4', drawing: require('drawings/K') })
+export let L = letterClass({ name: 'L', freq: 'G4', drawing: require('drawings/L') })
+// export let M = letterClass({ name: 'M', freq: 'A4', drawing: require('drawings/M') })
+// export let N = letterClass({ name: 'N', freq: 'B4', drawing: require('drawings/N') })
+export let O = letterClass({ name: 'O', freq: 'C5', drawing: require('drawings/O') })
+export let P = letterClass({ name: 'P', freq: 'D5', drawing: require('drawings/P') })
+export let Q = letterClass({ name: 'Q', freq: 'E5', drawing: require('drawings/Q') })
+export let R = letterClass({ name: 'R', freq: 'F5', drawing: require('drawings/R') })
+export let S = letterClass({ name: 'S', freq: 'G5', drawing: require('drawings/S') })
+// export let T = letterClass({ name: 'T', freq: 'A5', drawing: require('drawings/T') })
+export let U = letterClass({ name: 'U', freq: 'B5', drawing: require('drawings/U') })
+export let V = letterClass({ name: 'V', freq: 'C6', drawing: require('drawings/V') })
+// export let W = letterClass({ name: 'W', freq: 'D6', drawing: require('drawings/W') })
+// export let X = letterClass({ name: 'X', freq: 'E6', drawing: require('drawings/X') })

@@ -3,7 +3,7 @@ const isProduction = (process.env.NODE_ENV === 'production')
 
 module.exports = {
   // Used by the devServer and base href
-  public: isProduction ? './' : '/',
+  public: isProduction ? '/jupik/' : '/',
 
   // Used by the module bundler
   root: path.join(__dirname, '..'),
@@ -17,6 +17,7 @@ module.exports = {
   letters: path.join(__dirname, '..', 'src', 'letters'),
   core: path.join(__dirname, '..', 'src', 'core'),
   config: path.join(__dirname, '..', 'src', 'config'),
+  drawings: path.join(__dirname, '..', 'src', 'drawings'),
 
   // Generating page from content and layouts
   layouts: path.join(__dirname, '..', 'src', 'layouts'),
