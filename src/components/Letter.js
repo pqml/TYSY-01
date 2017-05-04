@@ -18,6 +18,7 @@ const defaultOpts = {
 export default class Letter {
   constructor (opts) {
     opts = Object.assign({}, defaultOpts, opts)
+    this.id = opts.id | 0
 
     this.osc = new Tone.OmniOscillator()
     this.osc.frequency.value = opts.frequency
@@ -225,7 +226,8 @@ export default class Letter {
     const pdist = ms2px(this.plife)
     const cdist = ms2px(this.life)
 
-    this.graphics.beginFill(0x000000, map(this.env.value, 0, 1, 1, 1))
+    const color = this.modifyColor()
+    this.graphics.beginFill(color.color, color.alpha)
 
     for (let i = 0; i < this.previousPaths.length; i++) {
       let points = []
@@ -246,12 +248,22 @@ export default class Letter {
     this.graphics.endFill()
   }
 
+  modifyColor () {
+    const color = 0xffffff
+    const alpha = map(this.env.value, 0, 1, 0.3, 1)
+    return { color, alpha }
+  }
+
   modifyPoints (points) {
-    const detune = (Math.cos(this.life * Store.get('fx.lfoFreq') / 1000) - 0.5) * Store.get('fx.lfoAmp')
+    const detune = (Math.cos(Store.get('time') * Store.get('fx.lfoFreq') / 1000) - 0.5) * Store.get('fx.lfoAmp')
     this.osc.detune.value = detune
 
     let nPoints = points.map(point => {
-      return point.map(v => v !== null ? v - detune : v)
+      return point.map(v => {
+        let out = v !== null ? v - detune : v
+        if (v !== null) out -= -180 * SCALE + this.id * (5 * SCALE)
+        return out
+      })
     })
 
     // calc offset for sprite rendering

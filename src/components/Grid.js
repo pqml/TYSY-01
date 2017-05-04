@@ -3,7 +3,7 @@ import Store from 'core/Store'
 import px2ms from 'utils/px2ms'
 import ms2px from 'utils/ms2px'
 
-const BPM = 100
+const BPM = 50
 const QUART = ((60000 / BPM) / 4) * 4
 
 export default class Grid {
@@ -26,6 +26,7 @@ export default class Grid {
 
   reset () {
     if (this.tile) this.tile.destroy()
+    if (this.marker) this.marker.destroy()
 
     const step = ms2px(QUART)
     const width = step * 4
@@ -35,7 +36,7 @@ export default class Grid {
     graphic.height = height
 
     for (let i = 0; i < 5; i++) {
-      graphic.lineStyle(1, !i ? 0x333333 : 0xdddddd, i === 5 ? 0 : 1)
+      graphic.lineStyle(1, !i ? 0x3e3e3e : 0x272727, i === 5 ? 0 : 1)
       graphic.moveTo(i * step, 0)
       graphic.lineTo(i * step, height)
     }
@@ -45,5 +46,13 @@ export default class Grid {
     this.tile.height = Store.get('size').h
     this.tile.width = Store.get('size').w
     this.container.addChild(this.tile)
+
+    // this.marker = new PIXI.Graphics()
+    // this.marker.width = 1
+    // this.marker.height = this.h
+    // this.marker.lineStyle(1, 0xff0000, 1)
+    // this.marker.moveTo(this.w / 2, 0)
+    // this.marker.lineTo(this.w / 2, this.h)
+    // this.container.addChild(this.marker)
   }
 }

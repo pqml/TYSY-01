@@ -6,9 +6,9 @@ const bounds = {
   minRelease: 150,
   maxRelease: 2000,
   minLfoFreq: 0.01,
-  maxLfoFreq: 200,
+  maxLfoFreq: 80,
   minLfoAmp: 0,
-  maxLfoAmp: 500
+  maxLfoAmp: 300
 }
 
 export default bounds

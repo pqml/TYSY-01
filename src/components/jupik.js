@@ -26,7 +26,7 @@ function jupik (opts) {
     {
       view: opts.canvas,
       resolution: window.devicePixelRatio,
-      backgroundColor: 0xffffff,
+      backgroundColor: 0x000000,
       antialias: false
     }
   )
@@ -65,7 +65,7 @@ function jupik (opts) {
     name: 'sustain',
     syncWith: 'controller.sustain',
     onInput: sustainChange,
-    default: 70,
+    default: 127,
     units: '%',
     transform (v) { return map(v, 0, 127, 0, 100).toFixed(2) }
   }))
@@ -103,7 +103,7 @@ function jupik (opts) {
   Store.set('fx.attack', bounds.minAttack / 1000)
   Store.set('fx.decay', bounds.minDecay / 1000)
   Store.set('fx.release', bounds.minRelease / 1000)
-  sustainChange(70)
+  sustainChange(127)
   lfoFreqChange(0.01)
   lfoAmpChange(0)
 
