@@ -1,7 +1,7 @@
 const contents = {
-  title: 'bro-start',
-  description: 'Blazing fast webpack setup for static websites',
-  message: 'Everything is working.\nHave fun!'
+  title: 'JUPIK',
+  description: '',
+  message: ''
 }
 
 const pages = [
