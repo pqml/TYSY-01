@@ -175,7 +175,7 @@ function jupik (opts) {
 
   function zoom (value) {
     const val = value / 100
-    const scale = camera.scale.x + val
+    const scale = Math.max(0.01, camera.scale.x + val)
     // stage.x = ms2px(Store.get('time'))
     // console.log(scale)
 

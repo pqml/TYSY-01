@@ -58,9 +58,9 @@ export default class Grid {
     // this.marker = new PIXI.Graphics()
     // this.marker.width = 1
     // this.marker.height = this.h
-    // this.marker.lineStyle(1, 0xff0000, 1)
-    // this.marker.moveTo(this.w / 2, 0)
-    // this.marker.lineTo(this.w / 2, this.h)
+    // this.marker.lineStyle(this.scale, 0xff0000, 1)
+    // this.marker.moveTo(this.w / 2 * this.scale, 0)
+    // this.marker.lineTo(this.w / 2 * this.scale, this.h * this.scale)
     // this.container.addChild(this.marker)
   }
 }
