@@ -49,6 +49,16 @@ function jupik (opts) {
 
   const controller = opts.controller
   controller.appendChild(slider({
+    name: 'tempo',
+    syncWith: 'controller.tempo',
+    onInput: tempoChange,
+    default: map(120, bounds.minTempo, bounds.maxTempo, 0, 127),
+    units: 'bpm',
+    transform (v) { return map(v, 0, 127, bounds.minTempo, bounds.maxTempo) | 0 }
+  }))
+
+
+  controller.appendChild(slider({
     name: 'attack',
     syncWith: 'controller.attack',
     onInput: attackChange,
@@ -97,11 +107,14 @@ function jupik (opts) {
   }))
 
 
+  Store.set('speed', 1)
+  Store.set('pan', 0)
   Store.set('scale', 1)
   Store.set('renderer', renderer)
   Store.set('zoom', 1)
   Store.set('size', { w: window.innerWidth, h: window.innerHeight })
   Store.set('time', 0)
+  Store.set('distance', 0)
   Store.set('fx.attack', bounds.minAttack / 1000)
   Store.set('fx.decay', bounds.minDecay / 1000)
   Store.set('fx.release', bounds.minRelease / 1000)
@@ -120,7 +133,14 @@ function jupik (opts) {
   return {
     tick,
     resize,
-    zoom
+    zoom,
+    pan
+  }
+
+  function tempoChange (tempo) {
+    const value = map(tempo, 0, 127, bounds.minTempo, bounds.maxTempo) | 0
+    Store.set('fx.tempo', value)
+    Store.set('speed', value / 127)
   }
 
   function attackChange (attack) {
@@ -174,23 +194,41 @@ function jupik (opts) {
   }
 
   function zoom (value) {
-    const val = value / 100
-    const scale = Math.max(0.01, camera.scale.x + val)
+    const scale = Math.max(0.01, camera.scale.x + value)
     // stage.x = ms2px(Store.get('time'))
     // console.log(scale)
 
     // const offset = val * Store.get('size').w / 2 * scale / 2
     // stage.x = stage.x - stage.x * val
+    setScale(scale)
+  }
+
+  function pan (val) {
+    Store.set('pan', Math.max(0, Store.get('pan') + val))
+    console.log(Store.get('pan'))
+  }
+
+  function setScale (scale) {
     Store.set('scale', scale)
     camera.scale.set(scale)
-    grid.zoom(val)
+    grid.zoom()
   }
 
   function tick (dt) {
-    // update global time
+    // update global time & distance
     const ntime = Store.get('time') + dt
+    const ndist = Store.get('distance') + ms2px(dt * Store.get('speed'))
     Store.set('time', ntime)
-    Store.set('distance', ms2px(ntime))
+    Store.set('distance', ndist)
+
+    // const speed = 1
+    // const offset = (Store.get('size').w / 4)
+    // const autoscale = (ndist / offset >= 1)
+    //   ? (1 / (ndist / offset)) * speed
+    //   : 1
+
+    // console.log(autoscale)
+    // setScale(autoscale)
 
     // update grid position
     grid.tick(dt)
@@ -199,7 +237,7 @@ function jupik (opts) {
     for (let k in letters) letters[k].forEach(letter => letter.tick(dt))
 
     // render the scene
-    stage.x -= ms2px(dt) //* Store.get('scale')
+    stage.x = -ndist + Store.get('pan') //* Store.get('scale')
     renderer.render(camera)
   }
 }

@@ -32,6 +32,8 @@ export default class Letter {
 
     this.plife = 0
     this.life = 0
+    this.pdistance = 0
+    this.distance = 0
     this.releaseInterval = 0
     this.step = STEPS.UNSTARTED
 
@@ -40,7 +42,7 @@ export default class Letter {
 
     this.drawing = scale(opts.drawing, SCALE)
 
-    this.container.x = ms2px(Store.get('time'))
+    this.container.x = Store.get('distance')
     this.container.y = Store.get('size').h / 2 + 100
     this.container.addChild(this.graphics)
     this.yOffset = null
@@ -110,6 +112,8 @@ export default class Letter {
     if (this.step === STEPS.UNSTARTED) return
     this.plife = this.life
     this.life += dt
+    this.pdistance = this.distance
+    this.distance += ms2px(dt * Store.get('speed'))
 
     if (this.step === STEPS.ATTACK_STARTED) {
       this.onAttackBegins()
@@ -159,6 +163,7 @@ export default class Letter {
 
   draw (dt) {
     this.drawPhaseX += ms2px(dt)
+    // this.drawPhaseX += ms2px(dt * Store.get('speed'))
     // const scale = this.container.scale.x
     if (this.step === STEPS.ENDED) return
 
@@ -223,8 +228,8 @@ export default class Letter {
 
     this.nextPaths = this.modifyPoints(interpolate(this.drawing[this.drawPhase], this.drawPhaseX))
 
-    const pdist = ms2px(this.plife)
-    const cdist = ms2px(this.life)
+    const pdist = this.pdistance
+    const cdist = this.distance
 
     const color = this.modifyColor()
     this.graphics.beginFill(color.color, color.alpha)

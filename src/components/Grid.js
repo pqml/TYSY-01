@@ -22,7 +22,7 @@ export default class Grid {
 
   tick (dt) {
     if (!this.tile) return
-    this.tile.tilePosition = new PIXI.Point(-Store.get('distance') - this.container.x, 0)
+    this.tile.tilePosition = new PIXI.Point((-Store.get('distance') + Store.get('pan')) % this.patternWidth - this.container.x, 0)
   }
 
   zoom () {
@@ -37,11 +37,13 @@ export default class Grid {
     if (this.marker) this.marker.destroy()
 
     const step = ms2px(QUART)
+    this.step = step
     const width = step * 4
     const height = 10
     const graphic = new PIXI.Graphics()
     graphic.width = width
     graphic.height = height
+    this.patternWidth = width
 
     for (let i = 0; i < 5; i++) {
       graphic.lineStyle(this.scale, !i ? 0xe6e6e6 : 0xefefef, i === 5 ? 0 : 1)
