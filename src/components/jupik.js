@@ -16,9 +16,10 @@ function jupik (opts) {
   opts = Object.assign({}, defaultOpts, opts)
 
   const stage = new PIXI.Container()
+  const camera = new PIXI.Container()
 
   // Start from the middle of the screen
-  stage.x = window.innerWidth / 2
+  // stage.x = window.innerWidth / 2
 
   const renderer = PIXI.autoDetectRenderer(
     window.innerWidth,
@@ -26,7 +27,7 @@ function jupik (opts) {
     {
       view: opts.canvas,
       resolution: window.devicePixelRatio,
-      backgroundColor: 0x000000,
+      backgroundColor: 0xffffff,
       antialias: false
     }
   )
@@ -96,6 +97,7 @@ function jupik (opts) {
   }))
 
 
+  Store.set('scale', 1)
   Store.set('renderer', renderer)
   Store.set('zoom', 1)
   Store.set('size', { w: window.innerWidth, h: window.innerHeight })
@@ -108,11 +110,17 @@ function jupik (opts) {
   lfoAmpChange(0)
 
   const grid = new Grid()
-  stage.addChild(grid.container)
+  stage.x = 0
+  stage.y = -window.innerHeight / 2
+  camera.addChild(grid.container)
+  camera.addChild(stage)
+  camera.x = window.innerWidth / 2
+  camera.y = window.innerHeight / 2
 
   return {
     tick,
-    resize
+    resize,
+    zoom
   }
 
   function attackChange (attack) {
@@ -165,6 +173,19 @@ function jupik (opts) {
     Store.set('size', { w, h })
   }
 
+  function zoom (value) {
+    const val = value / 100
+    const scale = camera.scale.x + val
+    // stage.x = ms2px(Store.get('time'))
+    // console.log(scale)
+
+    // const offset = val * Store.get('size').w / 2 * scale / 2
+    // stage.x = stage.x - stage.x * val
+    Store.set('scale', scale)
+    camera.scale.set(scale)
+    grid.zoom(val)
+  }
+
   function tick (dt) {
     // update global time
     const ntime = Store.get('time') + dt
@@ -178,8 +199,8 @@ function jupik (opts) {
     for (let k in letters) letters[k].forEach(letter => letter.tick(dt))
 
     // render the scene
-    stage.x -= ms2px(dt)
-    renderer.render(stage)
+    stage.x -= ms2px(dt) //* Store.get('scale')
+    renderer.render(camera)
   }
 }
 

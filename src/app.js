@@ -42,6 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', debounce(resize, 100))
   resize()
 
+  window.addEventListener('mousewheel', wheel)
+
+  function wheel (e) {
+    app.zoom(e.deltaY / 100)
+  }
+
   function resize () {
     app.resize(window.innerWidth, window.innerHeight)
   }

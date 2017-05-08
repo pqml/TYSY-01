@@ -249,8 +249,8 @@ export default class Letter {
   }
 
   modifyColor () {
-    const color = 0xffffff
-    const alpha = map(this.env.value, 0, 1, 0.3, 1)
+    const color = 0x000000
+    const alpha = 1 // map(this.env.value, 0, 1, 0.3, 1)
     return { color, alpha }
   }
 

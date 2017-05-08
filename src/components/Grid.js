@@ -13,15 +13,23 @@ export default class Grid {
     this.lines = []
     this.w = Store.get('size').w
     this.h = Store.get('size').h
-    this.zoom = Store.get('zoom')
-    this.reset()
+    this.container.x = -this.w / 2
+    this.container.y = -this.h / 2
+    console.log(this.w)
+    this.scale = Store.get('scale') || 1
+    this.zoom()
   }
 
   tick (dt) {
-    const distance = Store.get('distance')
     if (!this.tile) return
-    this.container.x = distance - this.w / 2
-    this.tile.tilePosition = new PIXI.Point(-distance, 0)
+    this.tile.tilePosition = new PIXI.Point(-Store.get('distance') - this.container.x, 0)
+  }
+
+  zoom () {
+    this.scale = 1 / Store.get('scale')
+    this.container.x = -this.w / 2 * this.scale
+    this.container.y = -this.h / 2 * this.scale
+    this.reset()
   }
 
   reset () {
@@ -36,15 +44,15 @@ export default class Grid {
     graphic.height = height
 
     for (let i = 0; i < 5; i++) {
-      graphic.lineStyle(1, !i ? 0x3e3e3e : 0x272727, i === 5 ? 0 : 1)
+      graphic.lineStyle(this.scale, !i ? 0xe6e6e6 : 0xefefef, i === 5 ? 0 : 1)
       graphic.moveTo(i * step, 0)
       graphic.lineTo(i * step, height)
     }
 
     const tex = Store.get('renderer').generateTexture(graphic, 1, window.devicePixelRatio)
     this.tile = new PIXI.extras.TilingSprite(tex)
-    this.tile.height = Store.get('size').h
-    this.tile.width = Store.get('size').w
+    this.tile.height = Store.get('size').h * this.scale
+    this.tile.width = Store.get('size').w * this.scale
     this.container.addChild(this.tile)
 
     // this.marker = new PIXI.Graphics()
