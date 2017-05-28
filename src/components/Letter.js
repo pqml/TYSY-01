@@ -42,8 +42,8 @@ export default class Letter {
 
     this.drawing = scale(opts.drawing, SCALE)
 
-    this.container.x = Store.get('distance')
-    this.container.y = Store.get('size').h / 2 + 100
+    this.container.x = Store.get('distance') + Store.get('size').w / 3
+    this.container.y = Store.get('size').h / 2
     this.container.addChild(this.graphics)
     this.yOffset = null
     this.drawPhaseX = 0

@@ -107,6 +107,8 @@ function jupik (opts) {
   }))
 
 
+
+
   Store.set('speed', 1)
   Store.set('pan', 0)
   Store.set('scale', 1)
@@ -123,12 +125,16 @@ function jupik (opts) {
   lfoAmpChange(0)
 
   const grid = new Grid()
+  controller.appendChild(grid.button)
+
   stage.x = 0
   stage.y = -window.innerHeight / 2
   camera.addChild(grid.container)
   camera.addChild(stage)
   camera.x = window.innerWidth / 2
   camera.y = window.innerHeight / 2
+
+  // const log = new letterLog()
 
   return {
     tick,

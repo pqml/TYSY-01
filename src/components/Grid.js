@@ -15,14 +15,22 @@ export default class Grid {
     this.h = Store.get('size').h
     this.container.x = -this.w / 2
     this.container.y = -this.h / 2
-    console.log(this.w)
+    this.active = true
     this.scale = Store.get('scale') || 1
+
+    this.button = document.createElement('button')
+    this.button.addEventListener('click', this.onButtonClick.bind(this))
+    this.updateButtonText()
     this.zoom()
   }
 
   tick (dt) {
-    if (!this.tile) return
-    this.tile.tilePosition = new PIXI.Point((-Store.get('distance') + Store.get('pan')) % this.patternWidth - this.container.x, 0)
+    if (!this.active || !this.tile) return
+    this.tile.tilePosition = new PIXI.Point(
+      (-Store.get('distance') + Store.get('pan') + Store.get('size').w / 3) % this.patternWidth - this.container.x,
+      0)
+    if (!this.marker) return
+    this.marker.x = Store.get('size').w / 3 + Store.get('pan')
   }
 
   zoom () {
@@ -32,10 +40,20 @@ export default class Grid {
     this.reset()
   }
 
-  reset () {
-    if (this.tile) this.tile.destroy()
-    if (this.marker) this.marker.destroy()
+  updateButtonText () {
+    this.button.textContent = this.active ? 'Grid OFF' : 'Grid ON'
+  }
 
+  onButtonClick () {
+    this.active = !this.active
+    this.reset()
+    this.updateButtonText()
+  }
+
+  reset () {
+    if (this.tile) this.tile.destroy(); this.tile = null
+    if (this.marker) this.marker.destroy(); this.marker = null
+    if (!this.active) return
     const step = ms2px(QUART)
     this.step = step
     const width = step * 4
@@ -57,12 +75,13 @@ export default class Grid {
     this.tile.width = Store.get('size').w * this.scale
     this.container.addChild(this.tile)
 
-    // this.marker = new PIXI.Graphics()
-    // this.marker.width = 1
-    // this.marker.height = this.h
-    // this.marker.lineStyle(this.scale, 0xff0000, 1)
-    // this.marker.moveTo(this.w / 2 * this.scale, 0)
-    // this.marker.lineTo(this.w / 2 * this.scale, this.h * this.scale)
-    // this.container.addChild(this.marker)
+    this.marker = new PIXI.Graphics()
+    this.marker.width = 1
+    this.marker.height = this.h
+    this.marker.lineStyle(this.scale, 0x000000, 1)
+
+    this.marker.moveTo(this.w / 2 * this.scale, 0)
+    this.marker.lineTo(this.w / 2 * this.scale, this.h * this.scale)
+    this.container.addChild(this.marker)
   }
 }

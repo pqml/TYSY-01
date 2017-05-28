@@ -6,12 +6,18 @@ import keyboard from 'components/keyboard'
 import debounce from 'lodash/debounce'
 import Store from 'core/Store'
 import Events from 'core/Events'
+import letterLog from 'components/letterLog'
 
 document.addEventListener('DOMContentLoaded', () => {
   const stats = new Stats()
   stats.dom.style.left = 'auto'
   stats.dom.style.right = '0'
   document.body.appendChild(stats.dom)
+
+  let zoomMode = true
+  const scrollButton = document.createElement('button')
+  scrollButton.addEventListener('click', onButtonClick)
+  updateButtonText()
 
   const controller = midigui({ visible: false, key: '=' })
     .add('attack')
@@ -32,10 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
   Store.set('midi.release', 0)
 
   keyboard({ monokey: false })
+  letterLog(document.getElementById('letterlog'))
   const app = jupik({
     canvas: document.getElementById('app'),
     controller: document.getElementById('controller')
   })
+  document.getElementById('controller').appendChild(scrollButton)
+
 
   raf.add(tick)
 
@@ -45,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('mousewheel', wheel)
 
   function wheel (e) {
-    app.zoom(e.deltaY / 10000)
-    // app.pan(e.deltaX / 10)
+    if (zoomMode) app.zoom(e.deltaY / 10000)
+    else app.pan(e.deltaY / 10)
   }
 
   function resize () {
@@ -57,6 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
     stats.begin()
     app.tick(dt)
     stats.end()
+  }
+
+  function onButtonClick () {
+    zoomMode = !zoomMode
+    updateButtonText()
+  }
+
+  function updateButtonText () {
+    scrollButton.textContent = zoomMode ? 'Scroll: PAN' : 'Scroll: ZOOM'
   }
 })
 
