@@ -17,7 +17,7 @@ module.exports = {
   letters: path.join(__dirname, '..', 'src', 'letters'),
   core: path.join(__dirname, '..', 'src', 'core'),
   config: path.join(__dirname, '..', 'src', 'config'),
-  drawings: path.join(__dirname, '..', 'src', 'drawings'),
+  glyphs: path.join(__dirname, '..', 'src', 'glyphs'),
 
   // Generating page from content and layouts
   layouts: path.join(__dirname, '..', 'src', 'layouts'),

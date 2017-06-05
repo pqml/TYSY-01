@@ -17,7 +17,8 @@ module.exports = {
       utils: paths.utils,
       letters: paths.letters,
       core: paths.core,
-      config: paths.config
+      config: paths.config,
+      glyphs: paths.glyphs
     },
     modules: [
       paths.src,

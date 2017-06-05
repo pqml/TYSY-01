@@ -6,7 +6,7 @@ function createLetterClass (opts) {
       super({
         id: opts.id,
         frequency: opts.freq,
-        drawing: opts.drawing.default
+        glyph: opts.glyph
       })
       this.name = opts.name
     }

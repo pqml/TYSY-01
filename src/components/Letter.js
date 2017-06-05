@@ -3,13 +3,13 @@ import Store from 'core/Store'
 import STEPS from 'config/steps'
 import * as PIXI from 'pixi.js'
 
-import map from 'utils/map'
 import ms2px from 'utils/ms2px'
-import px2ms from 'utils/px2ms'
-import { scale, interpolate, getDistance, getFirstPoints, compress } from 'utils/drawingTools'
+
+import jupikGlyph from 'components/jupikGlyph'
 
 const DEBUG = false
-const SCALE = window.innerHeight / 1000
+const SCALE = window.innerHeight / 2300
+const Y_OFFSET = 800
 
 const defaultOpts = {
   frequency: 'C4'
@@ -29,7 +29,6 @@ export default class Letter {
     this.osc.connect(this.env)
     this.env.toMaster()
 
-
     this.plife = 0
     this.life = 0
     this.pdistance = 0
@@ -37,10 +36,12 @@ export default class Letter {
     this.releaseInterval = 0
     this.step = STEPS.UNSTARTED
 
+    this.glyph = jupikGlyph()
+      .importGlyph(opts.glyph)
+      .setScale(SCALE)
+
     this.container = new PIXI.Container()
     this.graphics = new PIXI.Graphics()
-
-    this.drawing = scale(opts.drawing, SCALE)
 
     this.container.x = Store.get('distance') + Store.get('size').w / 3
     this.container.y = Store.get('size').h / 2
@@ -162,122 +163,87 @@ export default class Letter {
   }
 
   draw (dt) {
-    this.drawPhaseX += ms2px(dt)
-    // this.drawPhaseX += ms2px(dt * Store.get('speed'))
-    // const scale = this.container.scale.x
+    this.currentStepX += ms2px(dt)
     if (this.step === STEPS.ENDED) return
+    // initialization when each step are starting
+    if (this.step === STEPS.ATTACK && this.currentStep !== 'attack') {
+      this.adDuration = (this.attack + this.decay) * 1000
+      this.adDistance = ms2px(this.adDuration)
+      this.glyph.setAttackSize(this.adDistance * (1 / SCALE))
+      this.currentStep = 'attack'
+      this.previousGlyphSlice = null
+      this.currentStepX = 0
+    } else if (this.step === STEPS.SUSTAIN && this.currentStep !== 'sustain') {
+      this.currentStep = 'sustain'
+      this.previousGlyphSlice = null
+      this.currentStepX = 0
+    } else if (this.step === STEPS.RELEASE && this.currentStep !== 'release') {
+      this.rDuration = (this.release) * 1000
+      this.rDistance = ms2px(this.rDuration)
+      this.glyph.setReleaseSize(this.rDistance * (1 / SCALE))
+      this.currentStep = 'release'
+      this.previousGlyphSlice = null
+      this.currentStepX = 0
+    }
+    // draw
+    const pX = this.pdistance
+    const cX = this.distance
 
-    if (this.step === STEPS.ATTACK) {
-      // start attack
-      if (!this.adDuration) {
-        this.adDuration = (this.attack + this.decay) * 1000
-        this.adDistance = ms2px(this.adDuration)
+    this.currentGlyphSlice = this.modifyY(
+      this.glyph.getSlice(this.currentStep, this.currentStepX)
+    )
 
-        // homothetic resizing if we don't have enough place
-        const totalDist = getDistance(this.drawing.attackBegin) + getDistance(this.drawing.attackEnd)
-        if (this.adDistance < totalDist) {
-          const coef = this.adDistance / totalDist
-          this.drawing.attackBegin = compress(this.drawing.attackBegin, coef)
-          this.drawing.attackEnd = compress(this.drawing.attackEnd, coef)
-        }
+    if (!this.currentGlyphSlice) return
+    if (this.previousGlyphSlice === null) this.previousGlyphSlice = this.currentGlyphSlice.slice()
 
-        this.adEndDuration = px2ms(getDistance(this.drawing.attackEnd))
-        this.previousPaths = this.modifyPoints(getFirstPoints(this.drawing.attackBegin))
-        this.drawPhase = 'attackBegin'
-        this.drawPhaseX = 0
-      }
-      if (this.drawPhase !== 'attackEnd' && this.life >= (this.adDuration - this.adEndDuration)) {
-        this.drawPhase = 'attackEnd'
-        this.drawPhaseX = 0
-      }
-    } // eslint-disable-line
+    const color = this.modifyColor((this.currentGlyphSlice.length !== this.previousGlyphSlice.length))
 
-    else if (this.step === STEPS.SUSTAIN) {
-      if (this.drawPhase !== 'sustain') {
-        this.currentDrawPaths = this.drawing.sustain
-        this.previousPaths = this.modifyPoints(getFirstPoints(this.drawing.sustain))
-        this.drawPhase = 'sustain'
-        this.drawPhaseX = 0
-      }
-    } // eslint-disable-line
-
-    else if (this.step === STEPS.RELEASE) {
-      if (!this.lifeFromRelease) {
-        this.lifeFromRelease = this.life
-        this.rDuration = (this.release) * 1000
-        this.rDistance = ms2px(this.rDuration)
-
-        // homothetic resizing if we don't have enough place
-        const totalDist = getDistance(this.drawing.releaseBegin) + getDistance(this.drawing.releaseEnd)
-        if (this.rDistance < totalDist) {
-          const coef = this.rDistance / totalDist
-          this.drawing.releaseBegin = compress(this.drawing.releaseBegin, coef)
-          this.drawing.releaseEnd = compress(this.drawing.releaseEnd, coef)
-        }
-
-        this.rEndDuration = px2ms(getDistance(this.drawing.releaseEnd))
-        this.previousPaths = this.modifyPoints(getFirstPoints(this.drawing.releaseBegin))
-        this.drawPhase = 'releaseBegin'
-        this.drawPhaseX = 0
-      }
-      if (this.drawPhase !== 'releaseEnd' && (this.life - this.lifeFromRelease) >= (this.rDuration - this.rEndDuration)) {
-        this.drawPhase = 'releaseEnd'
-        this.drawPhaseX = 0
-      }
+    if (this.previousGlyphSlice.length !== this.currentGlyphSlice.length) {
+      this.previousGlyphSlice = this.currentGlyphSlice.slice()
     }
 
-    this.nextPaths = this.modifyPoints(interpolate(this.drawing[this.drawPhase], this.drawPhaseX))
-
-    const pdist = this.pdistance
-    const cdist = this.distance
-
-    const color = this.modifyColor()
     this.graphics.beginFill(color.color, color.alpha)
-
-    for (let i = 0; i < this.previousPaths.length; i++) {
-      let points = []
-      const previousPoints = this.previousPaths[i]
-      const nextPoints = this.nextPaths[i].slice().reverse()
-      previousPoints.forEach(pt => {
-        if (pt === null) return
-        points.push(pdist, pt)
-      })
-      nextPoints.forEach(pt => {
-        if (pt === null) return
-        points.push(cdist, pt)
-      })
-      if (points.length > 0) this.graphics.drawPolygon(points)
+    for (let i = 0; i < this.previousGlyphSlice.length; i += 2) {
+      const pY1 = this.previousGlyphSlice[i]
+      const pY2 = this.previousGlyphSlice[i + 1]
+      const cY1 = this.currentGlyphSlice[i]
+      const cY2 = this.currentGlyphSlice[i + 1]
+      this.graphics.drawPolygon([
+        pX, pY1,
+        pX, pY2,
+        cX, cY2,
+        cX, cY1
+      ])
     }
 
-    this.previousPaths = this.nextPaths
     this.graphics.endFill()
+    this.previousGlyphSlice = this.currentGlyphSlice.slice()
   }
 
-  modifyColor () {
-    const color = 0x000000
+  modifyColor (red) {
+    const color = red ? 0x000000 : 0x000000
     const alpha = 1 // map(this.env.value, 0, 1, 0.3, 1)
     return { color, alpha }
   }
 
-  modifyPoints (points) {
+  modifyY (yList) {
+    if (!yList) return false
     const detune = (Math.cos(Store.get('time') * Store.get('fx.lfoFreq') / 1000) - 0.5) * Store.get('fx.lfoAmp')
     this.osc.detune.value = detune
 
-    let nPoints = points.map(point => {
-      return point.map(v => {
-        let out = v !== null ? v - detune : v
-        if (v !== null) out -= -180 * SCALE + this.id * (5 * SCALE)
-        return out
-      })
+    // offset based on letter ID to limit letter overlap
+    const newYList = yList.map(y => {
+      y -= detune
+      y -= Y_OFFSET * SCALE + this.id * (5 * SCALE)
+      return y
+    })
+    // console.log(newYList)
+    // calc offset for sprite rendering
+    newYList.forEach(y => {
+      if (this.yOffset === null || y > this.yOffset) this.yOffset = y
     })
 
-    // calc offset for sprite rendering
-    nPoints.forEach(point => point.forEach(v => {
-      if (v === null) return
-      if (this.yOffset === null || v > this.yOffset) this.yOffset = v
-    }))
-
-    return nPoints
+    return newYList
     // modify points with FBO or other stuff
   }
 }

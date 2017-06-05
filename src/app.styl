@@ -1,4 +1,11 @@
+@font-face
+  font-family SquafoTysyRegular
+  src url('squafo_tysy-regular-webfont.woff2') format('woff2'), url('squafo_tysy-regular-webfont.woff') format('woff')
+  font-weight normal
+  font-style normal
+
 body
+  font-family SquafoTysyRegular, Arial
   margin 0
   padding 0
   overflow hidden
@@ -27,10 +34,14 @@ body
   width 100%
 
 #letterlog p
+  font-family SquafoTysyRegular, Arial
+  -webkit-font-smoothing antialiased
   margin 0 20px
   text-align right
 
 button
+  font-family SquafoTysyRegular, Arial
+  -webkit-font-smoothing antialiased
   float left
   transform translateY(10px)
   margin 0 10px
@@ -38,7 +49,7 @@ button
   background transparent
   opacity 0.3
   outline none
-  width 100px
+  width 120px
   height 50px
 
 button:hover

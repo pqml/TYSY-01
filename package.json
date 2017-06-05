@@ -53,6 +53,7 @@
   "dependencies": {
     "bel": "^4.6.0",
     "generic-pool": "^3.1.7",
+    "line-intersect": "^1.0.0",
     "lodash": "^4.17.4",
     "midigui": "pqml/midigui",
     "pixi.js": "^4.4.4",
