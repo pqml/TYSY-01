@@ -49,7 +49,7 @@ function jupik (opts) {
 
   const controller = opts.controller
   controller.appendChild(slider({
-    name: 'tempo',
+    name: 'Tempo',
     syncWith: 'controller.tempo',
     onInput: tempoChange,
     default: map(120, bounds.minTempo, bounds.maxTempo, 0, 127),
@@ -59,21 +59,21 @@ function jupik (opts) {
 
 
   controller.appendChild(slider({
-    name: 'attack',
+    name: 'Attack',
     syncWith: 'controller.attack',
     onInput: attackChange,
     transform (v) { return map(v, 0, 127, bounds.minAttack, bounds.maxAttack).toFixed(2) }
   }))
 
   controller.appendChild(slider({
-    name: 'decay',
+    name: 'Decay',
     syncWith: 'controller.decay',
     onInput: decayChange,
     transform (v) { return map(v, 0, 127, bounds.minDecay, bounds.maxDecay).toFixed(2) }
   }))
 
   controller.appendChild(slider({
-    name: 'sustain',
+    name: 'Sustain',
     syncWith: 'controller.sustain',
     onInput: sustainChange,
     default: 127,
@@ -82,14 +82,14 @@ function jupik (opts) {
   }))
 
   controller.appendChild(slider({
-    name: 'release',
+    name: 'Release',
     syncWith: 'controller.release',
     onInput: releaseChange,
     transform (v) { return map(v, 0, 127, bounds.minRelease, bounds.maxRelease).toFixed(2) }
   }))
 
   controller.appendChild(slider({
-    name: 'lfo freq',
+    name: 'LFO Freq',
     syncWith: 'controller.lfoFreq',
     onInput: lfoFreqChange,
     default: 0.01,
@@ -98,7 +98,7 @@ function jupik (opts) {
   }))
 
   controller.appendChild(slider({
-    name: 'lfo amp',
+    name: 'LFO Amp',
     syncWith: 'controller.lfoAmp',
     onInput: lfoAmpChange,
     default: 0,

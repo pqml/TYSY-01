@@ -43,11 +43,13 @@ export default class Letter {
     this.container = new PIXI.Container()
     this.graphics = new PIXI.Graphics()
 
-    this.container.x = Store.get('distance') + Store.get('size').w / 3
+    this.container.x = Store.get('distance') + Store.get('size').w / 2 - 230
     this.container.y = Store.get('size').h / 2
     this.container.addChild(this.graphics)
     this.yOffset = null
     this.drawPhaseX = 0
+
+    this.letterOffset = Store.get('button.letterOffset')
   }
 
   start () {
@@ -234,7 +236,8 @@ export default class Letter {
     // offset based on letter ID to limit letter overlap
     const newYList = yList.map(y => {
       y -= detune
-      y -= Y_OFFSET * SCALE + this.id * (5 * SCALE)
+      y -= Y_OFFSET * SCALE
+      if (this.letterOffset) y -= this.id * (10 * SCALE)
       return y
     })
     // console.log(newYList)

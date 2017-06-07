@@ -12,12 +12,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const stats = new Stats()
   stats.dom.style.left = 'auto'
   stats.dom.style.right = '0'
-  document.body.appendChild(stats.dom)
+  // document.body.appendChild(stats.dom)
 
   let zoomMode = true
   const scrollButton = document.createElement('button')
   scrollButton.addEventListener('click', onButtonClick)
   updateButtonText()
+
+  const offsetButton = document.createElement('button')
+  offsetButton.addEventListener('click', updateOffsetButton)
+  Store.set('button.letterOffset', false); updateOffsetButton()
+
+  const $inverter = document.querySelector('.inverter')
+  const darkModeButton = document.createElement('button')
+  darkModeButton.addEventListener('click', () => { toggleDarkMode() })
+  toggleDarkMode(false)
 
   const controller = midigui({ visible: false, key: '=' })
     .add('attack')
@@ -39,19 +48,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   keyboard({ monokey: false })
   letterLog(document.getElementById('letterlog'))
+  const $controller = document.getElementById('controller')
+  const $canvas = document.getElementById('app')
   const app = jupik({
-    canvas: document.getElementById('app'),
-    controller: document.getElementById('controller')
+    canvas: $canvas,
+    controller: $controller
   })
-  document.getElementById('controller').appendChild(scrollButton)
-
-
+  $controller.appendChild(scrollButton)
+  $controller.appendChild(offsetButton)
+  $controller.appendChild(darkModeButton)
   raf.add(tick)
 
   window.addEventListener('resize', debounce(resize, 100))
   resize()
 
-  window.addEventListener('mousewheel', wheel)
+  $canvas.addEventListener('mousewheel', wheel)
 
   function wheel (e) {
     if (zoomMode) app.zoom(e.deltaY / 10000)
@@ -76,5 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateButtonText () {
     scrollButton.textContent = zoomMode ? 'Scroll: PAN' : 'Scroll: ZOOM'
   }
+
+  function updateOffsetButton () {
+    const nVal = !Store.get('button.letterOffset')
+    Store.set('button.letterOffset', nVal)
+    offsetButton.textContent = nVal ? 'Letter Offset OFF' : 'Letter Offset ON'
+  }
+
+  function toggleDarkMode (force) {
+    const nVal = force !== undefined ? force : !$inverter.classList.contains('inverted')
+    if (nVal) $inverter.classList.add('inverted')
+    else $inverter.classList.remove('inverted')
+    darkModeButton.textContent = nVal ? 'Bright Mode' : 'Dark Mode'
+  }
+
 })
 

@@ -19,6 +19,7 @@ export default class Grid {
     this.scale = Store.get('scale') || 1
 
     this.button = document.createElement('button')
+    this.button.style['margin-top'] = '50px'
     this.button.addEventListener('click', this.onButtonClick.bind(this))
     this.updateButtonText()
     this.zoom()
@@ -30,7 +31,7 @@ export default class Grid {
       (-Store.get('distance') + Store.get('pan') + Store.get('size').w / 3) % this.patternWidth - this.container.x,
       0)
     if (!this.marker) return
-    this.marker.x = Store.get('size').w / 3 + Store.get('pan')
+    this.marker.x = Store.get('size').w / 2 - 230 + Store.get('pan')
   }
 
   zoom () {
