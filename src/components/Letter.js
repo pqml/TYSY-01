@@ -15,7 +15,7 @@ const defaultOpts = {
   frequency: 'C4'
 }
 
-const limiter = new Tone.Compressor(-50, 3)
+const limiter = new Tone.Compressor(-30, 3)
 limiter.toMaster()
 
 export default class Letter {
