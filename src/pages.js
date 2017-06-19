@@ -1,6 +1,6 @@
 const contents = {
-  title: 'JUPIK',
-  description: '',
+  title: 'TYSY-01',
+  description: 'TYSY-01 is a typographic synthetizer.',
   message: ''
 }
 

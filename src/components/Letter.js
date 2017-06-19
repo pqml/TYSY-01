@@ -15,6 +15,9 @@ const defaultOpts = {
   frequency: 'C4'
 }
 
+const limiter = new Tone.Compressor(-50, 3)
+limiter.toMaster()
+
 export default class Letter {
   constructor (opts) {
     opts = Object.assign({}, defaultOpts, opts)
@@ -22,12 +25,12 @@ export default class Letter {
 
     this.osc = new Tone.OmniOscillator()
     this.osc.frequency.value = opts.frequency
-    this.osc.type = 'sine'
+    this.osc.type = 'square'
 
     this.env = new Tone.AmplitudeEnvelope()
     this.env.releaseCurve = 'cosine'
     this.osc.connect(this.env)
-    this.env.toMaster()
+    this.env.connect(limiter)
 
     this.plife = 0
     this.life = 0

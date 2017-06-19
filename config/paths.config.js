@@ -3,7 +3,7 @@ const isProduction = (process.env.NODE_ENV === 'production')
 
 module.exports = {
   // Used by the devServer and base href
-  public: isProduction ? '/jupik/' : '/',
+  public: isProduction ? '/TYSY-01/' : '/',
 
   // Used by the module bundler
   root: path.join(__dirname, '..'),

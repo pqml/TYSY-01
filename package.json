@@ -1,7 +1,7 @@
 {
-  "name": "bro-start",
-  "version": "2.0.0",
-  "description": "Blazing fast webpack setup for static websites",
+  "name": "tysy-01",
+  "version": "1.0.0",
+  "description": "Prototype of the TYSY-01, a typographic synthetizer.",
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development node scripts/serve.js",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brocessing/bro-start"
+    "url": "git+https://github.com/pqml/TYSY-01"
   },
-  "author": "Brocessing",
+  "author": "Julien Pik",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brocessing/bro-start/issues"
+    "url": "https://github.com/pqml/TYSY-01/issues"
   },
-  "homepage": "https://github.com/brocessing/bro-start#readme",
+  "homepage": "https://github.com/pqml/TYSY-01#readme",
   "devDependencies": {
     "autoprefixer": "^6.7.7",
     "babel-core": "^6.24.0",
